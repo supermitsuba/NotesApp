@@ -1,0 +1,17 @@
+<ul class="list-group">
+	<li class="list-group-item" ng-repeat="note in notes">
+		<div class="panel panel-primary">
+			<div class="list-group-item panel-heading">
+				<span class="badge">{{ note.category }}</span>
+				<h4>{{ note.name }}</h4>
+			</div>
+		  	<div class="panel-body">
+    			<p>Created Date: {{ note.createdDate }}</p>
+				<p>Modified Date: {{ note.modifiedDate }}</p>
+				<div>
+					{{ note.comment }}
+				</div>
+		  	</div>
+		</div>
+	</li>
+</ul>

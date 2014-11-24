@@ -1,0 +1,30 @@
+{
+  "name": "notes",
+  "version": "0.0.1",
+  "description": "A web app to manage todo's and notes.",
+  "main": "server.js",
+  "dependencies": {
+    "express": "~4.10.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/supermitsuba/notes"
+  },
+  "keywords": [
+    "notes",
+    "todo",
+    "web",
+    "app"
+  ],
+  "author": "Jorden Lowe",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/supermitsuba/notes/issues"
+  },
+  "homepage": "https://github.com/supermitsuba/notes"
+}
