@@ -6,11 +6,14 @@
 				<h4>{{ note.name }}</h4>
 			</div>
 		  	<div class="panel-body">
-    			<p>Created Date: {{ note.createdDate }}</p>
-				<p>Modified Date: {{ note.modifiedDate }}</p>
-				<div>
-					{{ note.comment }}
-				</div>
+					<div class="row">
+						<div class="col-md-4">Created {{ note.friendlyCreatedDate() }}</div>
+						<div class="col-md-4 col-md-offset-1">Modified {{ note.friendlyModifiedDate() }}</div>
+					</div>
+
+					<div class="row">
+						<div class="col-md-8">{{ note.comment }}</div>
+					</div>
 		  	</div>
 		</div>
 	</li>

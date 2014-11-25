@@ -4,6 +4,15 @@ function Note (name, comment, createdDate, modifiedDate, category) {
     this.createdDate = createdDate;
     this.modifiedDate = modifiedDate;
     this.category = category;
+
+    this.friendlyCreatedDate = function(){
+      return moment(this.createdDate).fromNow();
+    }
+
+    this.friendlyModifiedDate = function(){
+      return moment(this.modifiedDate).fromNow();
+    }
+
     this.categoryClass = function(){
         if(this.category === 'work'){
             return "panel panel-danger";
