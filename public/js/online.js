@@ -1,3 +1,0 @@
-function isSiteOnline(){
-    return true;
-}

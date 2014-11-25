@@ -39,6 +39,6 @@ routerApp
             );
             listNotes.push( newItem );
         }
-        $scope.isOnline = isSiteOnline();
+        
         $scope.notes = listNotes;
     });
