@@ -14,6 +14,15 @@ routerApp.config(function($stateProvider, $urlRouterProvider) {
                     controller: 'homeContentController'
                 }
             }
+        })
+        .state('newNote',{
+            url : '/newNote',
+            views: {
+                'content' : {
+                    templateUrl: 'partials/createNote/content.html',
+                    controller: 'newNoteContentController'
+                }
+            }
         });
     });
 
@@ -39,6 +48,10 @@ routerApp
             );
             listNotes.push( newItem );
         }
-        
+
         $scope.notes = listNotes;
+    })
+    .controller('newNoteContentController', function($scope, $stateParams, $http) {
+        var homenote = new Note('', '', new Date(), new Date(), '');
+        $scope.note = homenote;
     });
