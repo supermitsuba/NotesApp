@@ -1,6 +1,6 @@
 <ul class="list-group">
 	<li class="list-group-item" ng-repeat="note in notes">
-		<div class="panel panel-primary">
+		<div ng-class="note.categoryClass()">
 			<div class="list-group-item panel-heading">
 				<span class="badge">{{ note.category }}</span>
 				<h4>{{ note.name }}</h4>
