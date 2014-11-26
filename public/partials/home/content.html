@@ -2,7 +2,7 @@
 	<li class="list-group-item" ng-repeat="note in notes">
 		<div ng-class="note.categoryClass()">
 			<div class="list-group-item panel-heading">
-				<span class="badge">{{ note.category }}</span>
+				<span class="badge">{{ note.category }} <button ng:click="delete($index)" >X</button></span>
 				<h4>{{ note.name }}</h4>
 			</div>
 		  	<div class="panel-body">

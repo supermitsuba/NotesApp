@@ -2,17 +2,16 @@
   <div class="list-group-item panel-heading">
     <h4>Create New Note</h4>
   </div>
-  {{ note.category }}
   <div class="panel-body">
     <form role="form">
       <div class="form-group">
         <label for="inputName">Note Name</label>
-        <input type="text" class="form-control" id="inputName" placeholder="Enter name">
+        <input type="text" ng-model="note.name" class="form-control" id="inputName" placeholder="Enter name">
       </div>
 
       <div class="form-group">
         <label for="inputName">Note Category</label>
-        <select class="form-control">
+        <select class="form-control" ng-model="note.category">
           <option value="home">home</option>
           <option value="work">work</option>
           <option value="random">random</option>
@@ -22,13 +21,12 @@
       <div class="form-group">
         <label for="inputName">Note Comment</label>
 
-          <textarea class="form-control" id="inputComment" placeholder="Enter comment">
-            {{ note.comment }}
+          <textarea  ng-model="note.comment" class="form-control" id="inputComment" placeholder="Enter comment">
           </textarea>
 
       </div>
 
-      <button type="submit" class="btn btn-default">Submit</button>
+      <button ng:click="createNote()" >Create</button>
     </form>
   </div>
 </div>
