@@ -29,25 +29,26 @@ routerApp.config(function($stateProvider, $urlRouterProvider) {
 routerApp
     .controller('homeContentController', function($scope, $stateParams, $http) {
         $scope.notes = getListOfNotes();
+        $scope.categories = getCategories();
 
-        $scope.delete = function(index) {
+        $scope.delete = function(note) {
 
           var r = confirm("Would you like to delete this record?");
           if (r == false) {
             return;
           }
 
-          var newList = getListOfNotes();
+          var index = $scope.notes.indexOf(note);
           if(index > -1){
-            newList.splice(index,1);
+            $scope.notes.splice(index,1);
           }
 
-          localStorage["mycrappydata"] = JSON.stringify(newList);
-          $scope.notes = getListOfNotes();
+          localStorage["mycrappydata"] = JSON.stringify($scope.notes);
         };
     })
     .controller('newNoteContentController', function($scope, $state, $http) {
         $scope.note = new Note('', '', new Date(), new Date(), '');
+        $scope.categories = getCategories();
         $scope.createNote = function() {
             var note = $scope.note;
             if(note.name == '' || note.name == null){
@@ -66,6 +67,10 @@ routerApp
             $state.go('home');
         };
     });
+
+function getCategories(){
+  return ['home', 'work', 'random', ''];
+}
 
 function getListOfNotes(){
 

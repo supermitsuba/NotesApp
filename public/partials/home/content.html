@@ -1,8 +1,15 @@
+<div>
+	<span>filter:</span>
+	<select ng-model="category">
+		<option ng-repeat="category in categories" selected="selected" ng-value="category">{{category}}</option>
+	</select>
+</div>
+
 <ul class="list-group">
-	<li class="list-group-item" ng-repeat="note in notes">
+	<li class="list-group-item" ng-repeat="note in notes | filter:category">
 		<div ng-class="note.categoryClass()">
 			<div class="list-group-item panel-heading">
-				<span class="badge">{{ note.category }} <button ng:click="delete($index)" >X</button></span>
+				<span class="badge">{{ note.category }} <button ng:click="delete(note)" >X</button></span>
 				<h4>{{ note.name }}</h4>
 			</div>
 		  	<div class="panel-body">

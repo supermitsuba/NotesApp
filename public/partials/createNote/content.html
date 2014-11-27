@@ -12,9 +12,7 @@
       <div class="form-group">
         <label for="inputName">Note Category</label>
         <select class="form-control" ng-model="note.category">
-          <option value="home">home</option>
-          <option value="work">work</option>
-          <option value="random">random</option>
+          <option ng-repeat="category in categories" selected="selected" ng-value="category">{{category}}</option>
         </select>
       </div>
 
