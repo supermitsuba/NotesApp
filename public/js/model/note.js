@@ -4,6 +4,8 @@ function Note (name, comment, createdDate, modifiedDate, category) {
     this.createdDate = createdDate;
     this.modifiedDate = modifiedDate;
     this.category = category;
+    this.isModified = true;
+    this.id = -1;
 
     this.friendlyCreatedDate = function(){
       return moment(this.createdDate).fromNow();

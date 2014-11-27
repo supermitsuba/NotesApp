@@ -25,17 +25,9 @@ routerApp.config(function($stateProvider, $urlRouterProvider) {
             }
         });
     });
-  /*var homenote = new Note('New Note', 'here is a new note', new Date(), new Date(), 'home');
-    var worknote = new Note('New Note2', 'here is a new note', new Date(), new Date(), 'work');
-    var randnote = new Note('New Note3', 'here is a new note', new Date(), new Date(), 'random');
 
-    if(localStorage["mycrappydata"]==null){
-    localStorage["mycrappydata"] = JSON.stringify([ homenote, worknote, randnote ]);
-  }
-  */
 routerApp
     .controller('homeContentController', function($scope, $stateParams, $http) {
-
         $scope.notes = getListOfNotes();
 
         $scope.delete = function(index) {
@@ -58,6 +50,15 @@ routerApp
         $scope.note = new Note('', '', new Date(), new Date(), '');
         $scope.createNote = function() {
             var note = $scope.note;
+            if(note.name == '' || note.name == null){
+                alert('Please enter a name for the note!');
+                return;
+            }
+
+            if(note.comment == '' || note.comment == null){
+                note.comment = note.name;
+            }
+
             var listOfNotes = getListOfNotes();
             listOfNotes.push(note);
             localStorage["mycrappydata"] = JSON.stringify(listOfNotes);
