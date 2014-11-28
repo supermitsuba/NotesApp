@@ -85,6 +85,10 @@ function getAllNotes(req, res){
       return;
     }
 
+    for(var i = 0; i < notes.length; i++){
+      notes[i].id = notes[i]._id;
+    }
+
     res.status(200).send(notes);
     res.end();
     return;

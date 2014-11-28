@@ -1,5 +1,8 @@
 
 var routerApp = angular.module('notes', ['ui.router']);
+var localStorageProvider = new localStorageProvider('mycrappydata');
+//var deletedStorageProvider = new localStorageProvider('deleteddata');
+var httpServiceProvider = new httpServiceProvider();
 
 routerApp.config(function($stateProvider, $urlRouterProvider) {
 
@@ -28,9 +31,18 @@ routerApp.config(function($stateProvider, $urlRouterProvider) {
 
 routerApp
     .controller('homeContentController', function($scope, $stateParams, $http) {
-        $scope.notes = getListOfNotes();
+        httpServiceProvider.httpService = $http;
+        httpServiceProvider.getAllNotes(
+            function(data){
+                localStorageProvider.mergeRecords(data);
+                $scope.notes = localStorageProvider.getAllNotes();
+            },
+            function(err){
+                $scope.notes = localStorageProvider.getAllNotes();
+            }
+        );
         $scope.categories = getCategories();
-        saveNotes($http);
+
         $scope.delete = function(note) {
 
           var r = confirm("Would you like to delete this record?");
@@ -43,7 +55,7 @@ routerApp
             $scope.notes.splice(index,1);
           }
 
-          localStorage["mycrappydata"] = JSON.stringify($scope.notes);
+          localStorageProvider.saveAllNotes($scope.notes);
         };
     })
     .controller('newNoteContentController', function($scope, $state, $http) {
@@ -61,70 +73,30 @@ routerApp
                 note.comment = note.name;
             }
 
-            var listOfNotes = getListOfNotes();
-            listOfNotes.push(note);
-            localStorage["mycrappydata"] = JSON.stringify(listOfNotes);
-            $scope.note = new Note('', '', new Date(), new Date(), '', -1, true);
+            localStorageProvider.saveOneNote(note);
             $state.go('home');
         };
     });
+function saveNotes(){
+    httpServiceProvider.httpService = $http
+
+    var listOfNotes = httpServiceProvider.processNotes(
+                        localStorageProvider.getAllNotes(),
+                        function(notes){
+                            $scope.notes = notes;
+                        },
+                        function(notes, index, newId){
+                            notes[index].id = newId;
+                            notes[index].isModified = false;
+                            localStorageProvider.saveAllNotes(notes);
+                            $scope.notes = notes;
+                        },
+                        function(notes, errorData)
+                        {
+                            $scope.notes = notes;
+                        });
+}
 
 function getCategories(){
   return ['home', 'work', 'random', ''];
-}
-
-function getListOfNotes(){
-
-  var list = JSON.parse(localStorage["mycrappydata"]);
-  var listNotes = [];
-
-  for(var i = 0; i < list.length; i++){
-    var newItem = new Note(list[i].name,
-      list[i].comment,
-      list[i].createdDate,
-      list[i].modifiedDate,
-      list[i].category,
-      list[i].id,
-      list[i].isModified
-    );
-    listNotes.push( newItem );
-  }
-
-  return listNotes;
-}
-
-function saveNotes(httpService){
-  var listOfNotes = getListOfNotes();
-
-  for(var i = 0; i < listOfNotes.length; i++){
-    if(listOfNotes[i].isModified){
-      var newNote = listOfNotes[i];
-      var index = i;
-
-      if(listOfNotes[i].id == -1){
-        httpService.post('/api/notes', { note: newNote }).
-        success(function (data, status, headers, config) {
-
-          newNote.isModified = false;
-          newNote.id = data.id;
-          listOfNotes[index]=newNote;
-          localStorage["mycrappydata"] = JSON.stringify(listOfNotes);
-        }).
-        error(function (data, status, headers, config) {
-
-        });
-      }
-      else{
-        httpService.put('/api/notes/'+note.id, { note: newNote }).
-        success(function (data, status, headers, config) {
-          listOfNotes[i].isModified = false;
-          listOfNotes[index]=newNote;
-          localStorage["mycrappydata"] = JSON.stringify(listOfNotes);
-        }).
-        error(function (data, status, headers, config) {
-
-        });
-      }
-    }
-  }
 }
