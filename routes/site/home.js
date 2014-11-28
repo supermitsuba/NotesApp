@@ -1,7 +1,7 @@
 var path = require('path');
 var fs = require('fs');
 
-module.exports = function (app, database, smtp) {
+module.exports = function (app) {
   app.get('/', IndexPage);
 };
 

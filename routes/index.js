@@ -1,14 +1,14 @@
 var fs = require('fs');
 var path = require('path');
 
-module.exports = function (app, dataProvider, smtpProvider) {
+module.exports = function (app, db) {
 
   fs.readdirSync('./routes/api').forEach(function (file) {
     // Avoid to read this current file.
     if (file === path.basename(__filename)) { return; }
 
     // Load the route file.
-    require('./api/' + file)(app);
+    require('./api/' + file)(app, db);
 
     if(process.env.DEBUGLOGGING){
       console.log('Loading API: %s', file);

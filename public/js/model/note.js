@@ -1,11 +1,11 @@
-function Note (name, comment, createdDate, modifiedDate, category) {
+function Note (name, comment, createdDate, modifiedDate, category, id, isModified) {
     this.name = name;
     this.comment = comment;
     this.createdDate = createdDate;
     this.modifiedDate = modifiedDate;
     this.category = category;
-    this.isModified = true;
-    this.id = -1;
+    this.isModified = isModified;
+    this.id = id;
 
     this.friendlyCreatedDate = function(){
       return moment(this.createdDate).fromNow();
