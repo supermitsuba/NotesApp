@@ -27,7 +27,7 @@ routerApp.config(function($stateProvider, $urlRouterProvider) {
 
 routerApp
     .controller('homeContentController', function($scope, $interval, noteFactory) {
-        noteFactory.getAllNotes(function(notes){
+        noteFactory.syncNotes(function(notes){
             $scope.notes = notes;
         });
         

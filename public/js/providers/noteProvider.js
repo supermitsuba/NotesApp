@@ -83,7 +83,7 @@ noteProvider.prototype.getAllNotes = function(notesFunc){
 	    error(function (data, status, headers, config) {
 	      	console.log('error');
 	      	if(notesFunc){
-				notesFunc(this.localStorageService.getAllNotes());
+				notesFunc(localStorageService.getAllNotes());
 			}
 	    });
 }
