@@ -36,7 +36,16 @@ localStorageProvider.prototype.getAllNotes = function(){
 
 localStorageProvider.prototype.saveOneNote = function(note){
   var listOfNotes = this.getAllNotes();
-  listOfNotes.push(note);
+  if(note.id == -1){
+      listOfNotes.push(note);
+  }
+  else{
+      var item = _.find(listOfNotes, function(i) {return i.id = note.id;});
+      var index = listOfNotes.indexOf(note);
+      if(index > -1){
+        listOfNotes[index] = item;
+      }
+  }
   this.saveAllNotes(listOfNotes);
 }
 

@@ -26,11 +26,18 @@ routerApp.config(function($stateProvider, $urlRouterProvider) {
     });
 
 routerApp
-    .controller('homeContentController', function($scope, noteFactory) {
+    .controller('homeContentController', function($scope, $interval, noteFactory) {
         noteFactory.getAllNotes(function(notes){
             $scope.notes = notes;
         });
+        
         $scope.categories = noteFactory.getCategories();
+
+        $interval(function() {
+            noteFactory.syncNotes(function(notes){
+                $scope.notes = notes;
+            });
+        }, 900000);
 
         $scope.delete = function(note) {
             var r = confirm("Would you like to delete this record?");
@@ -43,7 +50,7 @@ routerApp
             });
         };
     })
-    .controller('newNoteContentController', function($scope, noteFactory) {
+    .controller('newNoteContentController', function($scope, $state, noteFactory) {
         $scope.note = noteFactory.newNote();
         $scope.categories = noteFactory.getCategories();
 
@@ -59,10 +66,8 @@ routerApp
             }
 
             noteFactory.saveOneNote(note, function(note){
-
-            });
-            
-            $state.go('home');
+                $state.go('home');
+            });            
         };
     });
 
