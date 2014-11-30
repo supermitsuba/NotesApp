@@ -1,8 +1,8 @@
 
 var routerApp = angular.module('notes', ['ui.router']);
-var localStorageProvider = new localStorageProvider('mycrappydata');
-//var deletedStorageProvider = new localStorageProvider('deleteddata');
-var httpServiceProvider = new httpServiceProvider();
+var noteStorage = new localStorageProvider('mycrappydata');
+var deletedStorage = new localStorageProvider('deleteddata');
+var httpProvider = new httpServiceProvider();
 
 routerApp.config(function($stateProvider, $urlRouterProvider) {
 
@@ -31,17 +31,20 @@ routerApp.config(function($stateProvider, $urlRouterProvider) {
 
 routerApp
     .controller('homeContentController', function($scope, $stateParams, $http) {
-        httpServiceProvider.httpService = $http;
-        httpServiceProvider.getAllNotes(
+        $scope.notes = noteStorage.getAllNotes();
+        $scope.categories = getCategories();
+
+        httpProvider.httpService = $http;
+        httpProvider.getAllNotes(
             function(data){
-                localStorageProvider.mergeRecords(data);
-                $scope.notes = localStorageProvider.getAllNotes();
+                noteStorage.mergeRecords(data);
+                $scope.notes = noteStorage.getAllNotes();
+                saveNotes($http, $scope);
             },
             function(err){
-                $scope.notes = localStorageProvider.getAllNotes();
+                $scope.notes = noteStorage.getAllNotes();
             }
         );
-        $scope.categories = getCategories();
 
         $scope.delete = function(note) {
 
@@ -55,7 +58,12 @@ routerApp
             $scope.notes.splice(index,1);
           }
 
-          localStorageProvider.saveAllNotes($scope.notes);
+          if(note.id != -1){
+            deletedStorage.saveOneNote(note);
+          }
+
+          noteStorage.saveAllNotes($scope.notes);
+          saveNotes($http, $scope);
         };
     })
     .controller('newNoteContentController', function($scope, $state, $http) {
@@ -73,28 +81,41 @@ routerApp
                 note.comment = note.name;
             }
 
-            localStorageProvider.saveOneNote(note);
+            noteStorage.saveOneNote(note);
+
             $state.go('home');
         };
     });
-function saveNotes(){
-    httpServiceProvider.httpService = $http
+    
+function saveNotes(http, scope){
+    httpProvider.httpService = http
 
-    var listOfNotes = httpServiceProvider.processNotes(
-                        localStorageProvider.getAllNotes(),
-                        function(notes){
-                            $scope.notes = notes;
-                        },
-                        function(notes, index, newId){
-                            notes[index].id = newId;
-                            notes[index].isModified = false;
-                            localStorageProvider.saveAllNotes(notes);
-                            $scope.notes = notes;
-                        },
-                        function(notes, errorData)
-                        {
-                            $scope.notes = notes;
-                        });
+    httpProvider.processNotes(
+        noteStorage.getAllNotes(),
+        deletedStorage.getAllNotes(),
+
+        //unmodified
+        function(notes){
+            scope.notes = notes;
+        },
+        //insert or update
+        function(notes, index, newId){
+            notes[index].id = newId;
+            notes[index].isModified = false;
+            noteStorage.saveAllNotes(notes);
+            scope.notes = notes;
+        },
+        //delete
+        function(note){
+            //removed deleted note from list
+            deletedStorage.deleteOneNote(note);
+        },
+        //error
+        function(notes, errorData)
+        {
+            scope.notes = notes;
+        }
+    );
 }
 
 function getCategories(){

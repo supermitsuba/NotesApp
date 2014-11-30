@@ -36,13 +36,13 @@ function insertNote(req, res){
 function updateNote(req, res){
   var note = req.body.note;
   var noteId = req.query.id;
-  if(note.id == -1 && isNaN(noteId)){
+  if(note.id == -1 && noteId == -1 && noteId == null){
     res.status(400).send('The id was -1, so this is a post, not a put.')
     res.end();
     return;
   }
 
-  database.update(note, function (err, updatedNote) {
+  database.update({ _id:noteId }, note, {}, function (err, updatedNote) {
     if(err != null){
       res.status(500).send('A error happened in saving the record.');
       res.end();
@@ -56,21 +56,21 @@ function updateNote(req, res){
 };
 
 function deleteNote(req, res){
-  var noteId = req.query.id;
-  if(isNaN(noteId)){
-    res.status(400).send('The id was -1, so this is a post, not a put.')
+  var noteId = req.params.id;
+  if(noteId == null || noteId == ''){
+    res.status(400).send('There was not id.')
     res.end();
     return;
   }
 
-  database.delete({_id: noteId}, function (err, updatedNote) {
+  database.remove({_id: noteId}, {}, function (err, removedId) {
     if(err != null){
       res.status(500).send('A error happened in saving the record.');
       res.end();
       return;
     }
 
-    res.status(200).send(updatedNote);
+    res.status(200).send(removedId);
     res.end();
     return;
   });
@@ -87,6 +87,7 @@ function getAllNotes(req, res){
 
     for(var i = 0; i < notes.length; i++){
       notes[i].id = notes[i]._id;
+      notes[i].isModified = false;
     }
 
     res.status(200).send(notes);
