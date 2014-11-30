@@ -5,6 +5,7 @@ function Note (name, comment, createdDate, modifiedDate, category, id, isModifie
     this.modifiedDate = modifiedDate;
     this.category = category;
     this.isModified = isModified;
+    this.isDeleted = false;
     this.id = id;
 
     this.friendlyCreatedDate = function(){

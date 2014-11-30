@@ -18,15 +18,17 @@ localStorageProvider.prototype.getAllNotes = function(){
   var listNotes = [];
 
   for(var i = 0; i < list.length; i++){
-    var newItem = new Note(list[i].name,
-      list[i].comment,
-      list[i].createdDate,
-      list[i].modifiedDate,
-      list[i].category,
-      list[i].id,
-      list[i].isModified
-    );
-    listNotes.push( newItem );
+    if(!list[i].isDeleted){
+      var newItem = new Note(list[i].name,
+        list[i].comment,
+        list[i].createdDate,
+        list[i].modifiedDate,
+        list[i].category,
+        list[i].id,
+        list[i].isModified
+      );
+      listNotes.push( newItem );
+    }
   }
 
   return listNotes;
@@ -48,7 +50,7 @@ localStorageProvider.prototype.deleteOneNote = function(note){
 }
 
 localStorageProvider.prototype.mergeRecords = function(newNotes){
-  var list = JSON.parse(localStorage[this.localStorageKey]);
+  var list = this.getAllNotes();
 
   for(var i = 0; i < newNotes.length; i++){
     var selectedItem = _.find(list, function(item){ return item.id == newNotes[i].id && item.id != -1; } );
@@ -64,12 +66,15 @@ localStorageProvider.prototype.mergeRecords = function(newNotes){
       );
       list.push( newItem );
     }
-    else if(selectedItem.isModified > newNotes[i].isModified){
+    else if(moment(selectedItem.modifiedDate).isBefore(newNotes[i].modifiedDate)){
       var index = list.indexOf(selectedItem);
       list[index].name = newNotes[i].name;
       list[index].comment = newNotes[i].comment;
       list[index].modifiedDate = newNotes[i].modifiedDate;
       list[index].category = newNotes[i].category;
+      list[index].isModified = newNotes[i].isModified;
+      list[index].isDeleted = newNotes[i].isDeleted;
+      
     }
   }
 

@@ -1,8 +1,4 @@
-
 var routerApp = angular.module('notes', ['ui.router']);
-var noteStorage = new localStorageProvider('mycrappydata');
-var deletedStorage = new localStorageProvider('deleteddata');
-var httpProvider = new httpServiceProvider();
 
 routerApp.config(function($stateProvider, $urlRouterProvider) {
 
@@ -30,45 +26,26 @@ routerApp.config(function($stateProvider, $urlRouterProvider) {
     });
 
 routerApp
-    .controller('homeContentController', function($scope, $stateParams, $http) {
-        $scope.notes = noteStorage.getAllNotes();
-        $scope.categories = getCategories();
-
-        httpProvider.httpService = $http;
-        httpProvider.getAllNotes(
-            function(data){
-                noteStorage.mergeRecords(data);
-                $scope.notes = noteStorage.getAllNotes();
-                saveNotes($http, $scope);
-            },
-            function(err){
-                $scope.notes = noteStorage.getAllNotes();
-            }
-        );
+    .controller('homeContentController', function($scope, noteFactory) {
+        noteFactory.getAllNotes(function(notes){
+            $scope.notes = notes;
+        });
+        $scope.categories = noteFactory.getCategories();
 
         $scope.delete = function(note) {
+            var r = confirm("Would you like to delete this record?");
+            if (r == false) {
+                return;
+            }
 
-          var r = confirm("Would you like to delete this record?");
-          if (r == false) {
-            return;
-          }
-
-          var index = $scope.notes.indexOf(note);
-          if(index > -1){
-            $scope.notes.splice(index,1);
-          }
-
-          if(note.id != -1){
-            deletedStorage.saveOneNote(note);
-          }
-
-          noteStorage.saveAllNotes($scope.notes);
-          saveNotes($http, $scope);
+            noteFactory.deleteNote(note, function(notes){
+                $scope.notes = notes;
+            });
         };
     })
-    .controller('newNoteContentController', function($scope, $state, $http) {
-        $scope.note = new Note('', '', new Date(), new Date(), '', -1, true);
-        $scope.categories = getCategories();
+    .controller('newNoteContentController', function($scope, noteFactory) {
+        $scope.note = noteFactory.newNote();
+        $scope.categories = noteFactory.getCategories();
 
         $scope.createNote = function() {
             var note = $scope.note;
@@ -81,43 +58,18 @@ routerApp
                 note.comment = note.name;
             }
 
-            noteStorage.saveOneNote(note);
+            noteFactory.saveOneNote(note, function(note){
 
+            });
+            
             $state.go('home');
         };
     });
-    
-function saveNotes(http, scope){
-    httpProvider.httpService = http
 
-    httpProvider.processNotes(
-        noteStorage.getAllNotes(),
-        deletedStorage.getAllNotes(),
+routerApp.factory('noteFactory', function($http) {
+    return new noteProvider({
+        localStorageService: new localStorageProvider('notes'),
+        httpService:$http
+    });    
+});
 
-        //unmodified
-        function(notes){
-            scope.notes = notes;
-        },
-        //insert or update
-        function(notes, index, newId){
-            notes[index].id = newId;
-            notes[index].isModified = false;
-            noteStorage.saveAllNotes(notes);
-            scope.notes = notes;
-        },
-        //delete
-        function(note){
-            //removed deleted note from list
-            deletedStorage.deleteOneNote(note);
-        },
-        //error
-        function(notes, errorData)
-        {
-            scope.notes = notes;
-        }
-    );
-}
-
-function getCategories(){
-  return ['home', 'work', 'random', ''];
-}
