@@ -1,30 +1,31 @@
-function Note (name, comment, createdDate, modifiedDate, category, id, isModified) {
-    this.name = name;
-    this.comment = comment;
-    this.createdDate = createdDate;
-    this.modifiedDate = modifiedDate;
-    this.category = category;
-    this.isModified = isModified;
-    this.isDeleted = false;
-    this.id = id;
-
-    this.friendlyCreatedDate = function(){
-      return moment(this.createdDate).fromNow();
+/// <reference path="./Category.ts" />
+var Note = (function () {
+    function Note(name, comment, createdDate, modifiedDate, category, id, isModified, isDeleted) {
+        this.name = name;
+        this.comment = comment;
+        this.createdDate = createdDate;
+        this.modifiedDate = modifiedDate;
+        this.category = category;
+        this.id = id;
+        this.isModified = isModified;
+        this.isDeleted = isDeleted;
     }
-
-    this.friendlyModifiedDate = function(){
-      return moment(this.modifiedDate).fromNow();
-    }
-
-    this.categoryClass = function(){
-        if(this.category === 'work'){
+    Note.prototype.friendlyCreatedDate = function () {
+        return moment(this.createdDate).fromNow();
+    };
+    Note.prototype.friendlyModifiedDate = function () {
+        return moment(this.modifiedDate).fromNow();
+    };
+    Note.prototype.categoryClass = function () {
+        if (this.category === 1 /* Work */) {
             return "panel panel-danger";
         }
-        else if(this.category === 'home'){
+        else if (this.category === 0 /* Home */) {
             return "panel panel-success";
         }
-        else{
+        else {
             return "panel panel-info";
         }
-    }
-}
+    };
+    return Note;
+})();
