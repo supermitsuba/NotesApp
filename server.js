@@ -22,9 +22,10 @@ function main() {
 
   // Load all routes.
   require('./routes')(app, db);
-
+      
   // Listen on http port.
-  server.listen(process.env.PORT);
+  //server.listen(process.env.PORT);
+  console.log('Express server listening on port '+process.env.PORT);
 }
 
 main();

@@ -3,7 +3,7 @@
 /// <reference path="./providers/LocalStorageProvider.ts" />
 /// <reference path="./providers/NoteProvider.ts" />
 
-var routerApp = angular.module('notes', ['ui.router']);
+var routerApp = angular.module('notes', ['ui.router']);  
 
 routerApp.config(function($stateProvider, $urlRouterProvider) {
 
@@ -33,15 +33,15 @@ routerApp.config(function($stateProvider, $urlRouterProvider) {
 routerApp
     .controller('homeContentController', function($scope, $interval, noteFactory) {
         noteFactory.syncNotes(function(notes){
-            $scope.notes = _.filter(notes, function(i){return !notes.isDeleted;});
+            $scope.notes = notes;
         });
         
         $scope.categories = noteFactory.getCategories();
 
         $interval(function() {
             noteFactory.syncNotes(function(notes){
-                $scope.notes = _.filter(notes, function(i){return !notes.isDeleted;});
-            });
+                $scope.notes = notes;
+            });    
         }, 30000);
 
         $scope.delete = function(note) {
@@ -51,7 +51,7 @@ routerApp
             }
 
             noteFactory.deleteNote(note, function(notes){
-                $scope.notes = _.filter(notes, function(i){return !notes.isDeleted;});
+                $scope.notes = notes;
             });
         };
     })
@@ -62,7 +62,7 @@ routerApp
         $scope.createNote = function() {
             var note:Note = $scope.note;
             if(note.name == '' || note.name == null){
-                alert('Please enter a name for the note!');
+                alert('Please enter a name  for the note!');
                 return;
             }
 
@@ -83,3 +83,14 @@ routerApp.factory('noteFactory', function($http) {
                 );    
 });
 
+routerApp.filter('notesFilter', function() {
+  return function(items) {
+    var filtered = [];
+    angular.forEach(items, function(item) {
+        if(!item.isDeleted){
+            filtered.push(item);
+        }
+    });
+    return filtered;
+  };
+});

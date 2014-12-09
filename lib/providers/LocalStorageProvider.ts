@@ -9,13 +9,13 @@ class LocalStorageProvider{
 	}
 
 	saveAllNotes(notes: Note[]){
-	  localStorage[this.localStorageKey] = JSON.stringify(notes);
+	  localStorage[this.key] = JSON.stringify(notes);
 	}
 
 	getAllNotes(){
 	  	var list = [];
 	  	try{
-	     	list = JSON.parse(localStorage[this.localStorageKey]);
+	     	list = JSON.parse(localStorage[this.key]);
 	  	}
 	  	catch(err)
 	  	{

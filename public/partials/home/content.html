@@ -6,7 +6,7 @@
 </div>
 
 <ul class="list-group">
-	<li class="list-group-item" ng-repeat="note in notes | filter:{category:category, isDeleted:false}">
+	<li class="list-group-item" ng-repeat="note in notes | notesFilter | filter:category">
 		<div ng-class="note.categoryClass()">
 			<div class="list-group-item panel-heading">
 				<span class="badge">{{ note.category }} <button ng:click="delete(note)" >X</button></span>

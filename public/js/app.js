@@ -44,12 +44,12 @@ var LocalStorageProvider = (function () {
         this.key = key;
     }
     LocalStorageProvider.prototype.saveAllNotes = function (notes) {
-        localStorage[this.localStorageKey] = JSON.stringify(notes);
+        localStorage[this.key] = JSON.stringify(notes);
     };
     LocalStorageProvider.prototype.getAllNotes = function () {
         var list = [];
         try {
-            list = JSON.parse(localStorage[this.localStorageKey]);
+            list = JSON.parse(localStorage[this.key]);
         }
         catch (err) {
             list = [];
@@ -231,16 +231,12 @@ routerApp.config(function ($stateProvider, $urlRouterProvider) {
 });
 routerApp.controller('homeContentController', function ($scope, $interval, noteFactory) {
     noteFactory.syncNotes(function (notes) {
-        $scope.notes = _.filter(notes, function (i) {
-            return !notes.isDeleted;
-        });
+        $scope.notes = notes;
     });
     $scope.categories = noteFactory.getCategories();
     $interval(function () {
         noteFactory.syncNotes(function (notes) {
-            $scope.notes = _.filter(notes, function (i) {
-                return !notes.isDeleted;
-            });
+            $scope.notes = notes;
         });
     }, 30000);
     $scope.delete = function (note) {
@@ -249,9 +245,7 @@ routerApp.controller('homeContentController', function ($scope, $interval, noteF
             return;
         }
         noteFactory.deleteNote(note, function (notes) {
-            $scope.notes = _.filter(notes, function (i) {
-                return !notes.isDeleted;
-            });
+            $scope.notes = notes;
         });
     };
 }).controller('newNoteContentController', function ($scope, $state, noteFactory) {
@@ -260,7 +254,7 @@ routerApp.controller('homeContentController', function ($scope, $interval, noteF
     $scope.createNote = function () {
         var note = $scope.note;
         if (note.name == '' || note.name == null) {
-            alert('Please enter a name for the note!');
+            alert('Please enter a name  for the note!');
             return;
         }
         if (note.comment == '' || note.comment == null) {
@@ -273,4 +267,15 @@ routerApp.controller('homeContentController', function ($scope, $interval, noteF
 });
 routerApp.factory('noteFactory', function ($http) {
     return new NoteProvider(new LocalStorageProvider('notes'), $http);
+});
+routerApp.filter('notesFilter', function () {
+    return function (items) {
+        var filtered = [];
+        angular.forEach(items, function (item) {
+            if (!item.isDeleted) {
+                filtered.push(item);
+            }
+        });
+        return filtered;
+    };
 });
