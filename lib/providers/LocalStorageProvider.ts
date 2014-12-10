@@ -47,10 +47,10 @@ class LocalStorageProvider{
 
 	updateOneNote(note: Note){
   		var listOfNotes = this.getAllNotes();
-  		var item = _.find(listOfNotes, function(i) {return i.id = note.id;});
-  		var index = listOfNotes.indexOf(item);
-  		if(index > -1){
-    		listOfNotes[index] = note;
+  		for(var i : number = 0; i < listOfNotes.length; i++){
+    		if(listOfNotes[i].equals(note)){
+    			listOfNotes[i].copyNote(note);
+    		}
   		}
 
   		this.saveAllNotes(listOfNotes);
@@ -58,9 +58,11 @@ class LocalStorageProvider{
 
 	deleteOneNote(note: Note){
   		var listOfNotes = this.getAllNotes();
-  		var index = listOfNotes.indexOf(note);
-  		if(index > -1){
-    		listOfNotes.splice(index,1);
+  		for(var i : number = 0; i < listOfNotes.length; i++){
+    		if(listOfNotes[i].equals(note)){
+    			listOfNotes.splice(i,1);
+    			break;
+    		}
   		}
 
   		this.saveAllNotes(listOfNotes);
@@ -70,7 +72,7 @@ class LocalStorageProvider{
   		var list = this.getAllNotes();
 
 	  	for(var i = 0; i < newNotes.length; i++){
-	    	var selectedItem = _.find(list, function(item){ return item.id == newNotes[i].id && item.id != -1; } );
+	    	var selectedItem = _.find(list, function(item){ return item.equals(newNotes[i]); } );
 
 	    	if(selectedItem == null){
 	      		var newItem = new Note(newNotes[i].name,
@@ -86,13 +88,7 @@ class LocalStorageProvider{
 	    	}
 	    	else if(moment(selectedItem.modifiedDate).isBefore(newNotes[i].modifiedDate)){
 		      	var index = list.indexOf(selectedItem);
-		      	list[index].name = newNotes[i].name;
-		      	list[index].comment = newNotes[i].comment;
-		      	list[index].modifiedDate = newNotes[i].modifiedDate;
-		      	list[index].category = newNotes[i].category;
-		      	list[index].isModified = newNotes[i].isModified;
-		      	list[index].isDeleted = newNotes[i].isDeleted;
-		      
+		      	list[index].copyNote(newNotes[i]);
 			}
 		}
 

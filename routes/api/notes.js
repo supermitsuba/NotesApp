@@ -70,7 +70,7 @@ function deleteNote(req, res){
       return;
     }
 
-    res.status(200).send(removedId);
+    res.status(200).send(noteId);
     res.end();
     return;
   });

@@ -5,16 +5,17 @@ class Note {
     comment: string;
     createdDate: Date;
     modifiedDate: Date;
-    category: Category;
+    category: string;
     isModified: boolean;
     isDeleted: boolean;
     id: string;
+    isNotDeleted: boolean;
 
     constructor(name: string, 
                 comment: string, 
                 createdDate: Date, 
                 modifiedDate: Date, 
-                category: Category,
+                category: string,
                 id: string, 
                 isModified: boolean, 
                 isDeleted: boolean) {
@@ -25,7 +26,35 @@ class Note {
         this.category = category;
         this.id = id;
         this.isModified = isModified;
-        this.isDeleted = isDeleted;   
+        this.isDeleted = isDeleted;  
+        this.isNotDeleted = !isDeleted;  
+    }
+
+    copyNote(updatedNote:Note){
+        this.name = updatedNote.name;
+        this.comment = updatedNote.comment;
+        this.createdDate = updatedNote.createdDate;
+        this.modifiedDate = updatedNote.modifiedDate;
+        this.category = updatedNote.category;
+        this.isModified = updatedNote.isModified;
+        this.isDeleted = updatedNote.isDeleted;  
+        this.isNotDeleted = !updatedNote.isDeleted;  
+    }
+
+    equals(otherNote:Note){
+        if(this.id === otherNote.id && this.id !== "-1"){
+            return true;
+        }
+
+        if(this.name === otherNote.name &&
+            this.comment === otherNote.comment &&
+            this.createdDate === otherNote.createdDate &&
+            this.category === otherNote.category){
+            return true;
+        }
+        else{
+            return false;
+        }
     }
 
     friendlyCreatedDate(){
@@ -37,10 +66,10 @@ class Note {
     }
 
     categoryClass(){
-        if(this.category === Category.Work){
+        if(this.category === 'Work'){
             return "panel panel-danger";
         }
-        else if(this.category === Category.Home){
+        else if(this.category === 'Home'){
             return "panel panel-success";
         }
         else{

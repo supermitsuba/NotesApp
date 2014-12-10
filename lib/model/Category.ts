@@ -1,7 +1,5 @@
-enum Category 
-{
-	None = -1,
-	Home, 
-	Work, 
-	Random
-};
+var Category :string[] = 
+			['',
+			 'Home', 
+			 'Work', 
+			 'Random']

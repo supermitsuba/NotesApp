@@ -76,21 +76,10 @@ routerApp
         };
     });
 
-routerApp.factory('noteFactory', function($http) {
+routerApp.factory('noteFactory', function($http, $log, $q) {
     return new NoteProvider(
                     new LocalStorageProvider('notes'),
-                    $http
+                    $http,
+                    $q
                 );    
-});
-
-routerApp.filter('notesFilter', function() {
-  return function(items) {
-    var filtered = [];
-    angular.forEach(items, function(item) {
-        if(!item.isDeleted){
-            filtered.push(item);
-        }
-    });
-    return filtered;
-  };
 });
