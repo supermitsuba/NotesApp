@@ -148,9 +148,14 @@ var NoteProvider = (function () {
         var func = notesFunc;
         var http = this.httpService;
         this.promise.all(urlCalls).then(function (results) {
-            http.get('/api/notes', { cache: false }).success(function (data, status, headers, config) {
+            http.get('/api/notes', { cache: false, timeout: 200 }).success(function (data, status, headers, config) {
                 localStorageService.saveAllNotes(data);
                 func(localStorageService.getAllNotes());
+            }).error(function (data, status, headers, config) {
+                console.log('Get All Notes - Error');
+                if (notesFunc) {
+                    notesFunc(localStorageService.getAllNotes());
+                }
             });
         }, function (errors) {
             func(localStorageService.getAllNotes());

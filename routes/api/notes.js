@@ -90,7 +90,11 @@ function getAllNotes(req, res){
       notes[i].isModified = false;
     }
 
-    res.status(200).send(notes);
+    res.status(200).send(notes.sort(function(a, b) {
+        a = new Date(a.modifiedDate);
+        b = new Date(b.modifiedDate);
+        return a>b ? -1 : a<b ? 1 : 0;
+    }).reverse());
     res.end();
     return;
   });

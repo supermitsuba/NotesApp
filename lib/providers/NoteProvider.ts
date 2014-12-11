@@ -21,6 +21,7 @@ class NoteProvider{
 	}
 
 	syncNotes(notesFunc: SuccessfulNotesFunc){
+
 		var localStorageService:LocalStorageProvider = this.localStorageService;
 		var localNotes: Note[] = localStorageService.getAllNotes();
 		     	
@@ -49,20 +50,24 @@ class NoteProvider{
 		this.promise.all(urlCalls)
           .then(
             function(results) {
-             http.get('/api/notes', { cache:false }).
+             http.get('/api/notes', { cache:false, timeout:200 }).
              	success(function (data, status, headers, config) {
              		localStorageService.saveAllNotes(data);
              		func(localStorageService.getAllNotes());
-             	});
+             	})
+             	.error(function (data, status, headers, config) {
+		      	console.log('Get All Notes - Error');
+		      	if(notesFunc){
+					notesFunc(localStorageService.getAllNotes());
+				}
+		    });
           },
           function(errors) {
           		func(localStorageService.getAllNotes());
           },
           function(updates) {
 
-          });
-
-		
+          });		
 	}
 
 	getAllNotes(notesFunc: SuccessfulNotesFunc){
