@@ -4,7 +4,8 @@
   "description": "A web app to manage todo's and notes.",
   "main": "server.js",
   "dependencies": {
-    "express": "~4.10.2"
+    "express": "~4.10.2",
+    "nedb": "^1.0.0"
   },
   "devDependencies": {
     "grunt": "~0.4.5",
