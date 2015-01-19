@@ -9,7 +9,19 @@ class LocalStorageProvider{
 	}
 
 	saveAllNotes(notes: Note[]){
-	  localStorage[this.key] = JSON.stringify(notes);
+
+		var newarr = [];
+		var unique = {};
+		 
+		for(var i = 0 ; i < notes.length; i++) {
+			var item = notes[i];
+		    if (!unique[item.createdDate]) {
+		        newarr.push(item);
+		        unique[item.createdDate] = item;
+		    }
+		}
+
+	  	localStorage[this.key] = JSON.stringify(newarr);
 	}
 
 	getAllNotes(){

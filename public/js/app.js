@@ -59,7 +59,16 @@ var LocalStorageProvider = (function () {
         this.key = key;
     }
     LocalStorageProvider.prototype.saveAllNotes = function (notes) {
-        localStorage[this.key] = JSON.stringify(notes);
+        var newarr = [];
+        var unique = {};
+        for (var i = 0; i < notes.length; i++) {
+            var item = notes[i];
+            if (!unique[item.createdDate]) {
+                newarr.push(item);
+                unique[item.createdDate] = item;
+            }
+        }
+        localStorage[this.key] = JSON.stringify(newarr);
     };
     LocalStorageProvider.prototype.getAllNotes = function () {
         var list = [];
@@ -338,16 +347,14 @@ routerApp.config(function ($stateProvider, $urlRouterProvider) {
 });
 routerApp.controller('homeContentController', function ($scope, $interval, noteFactory) {
     $scope.categories = noteFactory.getCategories();
-    if ($scope.notes == null) {
-        noteFactory.syncNotes(function (notes) {
-            $scope.notes = notes;
-        });
-    }
+    noteFactory.syncNotes(function (notes) {
+        $scope.notes = notes;
+    });
     $interval(function () {
         noteFactory.syncNotes(function (notes) {
             $scope.notes = notes;
         });
-    }, 60000);
+    }, 30000);
     $scope.delete = function (note) {
         var r = confirm("Would you like to delete this record?");
         if (r == false) {
