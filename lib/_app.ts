@@ -31,18 +31,14 @@ routerApp.config(function($stateProvider, $urlRouterProvider) {
     });
 
 routerApp
-    .controller('homeContentController', function($scope, $interval, noteFactory) {
-        noteFactory.syncNotes(function(notes){
-            $scope.notes = notes;
-        });
-        
+    .controller('homeContentController', function($scope, $interval, noteFactory) {        
         $scope.categories = noteFactory.getCategories();
 
         $interval(function() {
             noteFactory.syncNotes(function(notes){
                 $scope.notes = notes;
             }); 
-        }, 30000);
+        }, 60000);
 
 
         $scope.delete = function(note) {
