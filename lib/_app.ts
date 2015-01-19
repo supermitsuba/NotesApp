@@ -34,9 +34,11 @@ routerApp
     .controller('homeContentController', function($scope, $interval, noteFactory) {        
         $scope.categories = noteFactory.getCategories();
 
-        noteFactory.syncNotes(function(notes){
+        if($scope.notes == null){
+            noteFactory.syncNotes(function(notes){
                 $scope.notes = notes;
-        });
+            }); 
+        }
 
         $interval(function() {
             noteFactory.syncNotes(function(notes){

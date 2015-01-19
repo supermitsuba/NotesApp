@@ -337,15 +337,17 @@ routerApp.config(function ($stateProvider, $urlRouterProvider) {
     });
 });
 routerApp.controller('homeContentController', function ($scope, $interval, noteFactory) {
-    noteFactory.syncNotes(function (notes) {
-        $scope.notes = notes;
-    });
     $scope.categories = noteFactory.getCategories();
+    if ($scope.notes == null) {
+        noteFactory.syncNotes(function (notes) {
+            $scope.notes = notes;
+        });
+    }
     $interval(function () {
         noteFactory.syncNotes(function (notes) {
             $scope.notes = notes;
         });
-    }, 30000);
+    }, 60000);
     $scope.delete = function (note) {
         var r = confirm("Would you like to delete this record?");
         if (r == false) {
