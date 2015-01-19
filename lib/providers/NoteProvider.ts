@@ -9,6 +9,10 @@ interface SuccessfulNoteFunc {
   ( notes: Note): void;
 }
 
+interface IsOnlineFunc {
+  ( isOnline: boolean ): void;
+}
+
 class NoteProvider{
 	private httpService: any;
 	private localStorageService:LocalStorageProvider;
@@ -18,6 +22,21 @@ class NoteProvider{
 		this.httpService = httpService;
 		this.localStorageService = localStorageService;
 		this.promise = promise;
+	}
+
+	isOnline(myFunc: IsOnlineFunc){
+		var xmlhttp=new XMLHttpRequest();
+		xmlhttp.onreadystatechange=function() {
+		    if (xmlhttp.readyState==4 && xmlhttp.status==200) {
+		    	myFunc(true);
+		    }
+		    else {
+		    	myFunc(false);
+		    }
+		}
+
+		xmlhttp.open("GET","online.txt",true);
+		xmlhttp.send();
 	}
 
 	syncNotes(notesFunc: SuccessfulNotesFunc){
@@ -46,28 +65,36 @@ class NoteProvider{
 
 		var func = notesFunc;
 		var http:any = this.httpService;
+		var p = this.promise;
 
-		this.promise.all(urlCalls)
-          .then(
-            function(results) {
-             http.get('/api/notes', { cache:false, timeout:200 }).
-             	success(function (data, status, headers, config) {
-             		localStorageService.saveAllNotes(data);
-             		func(localStorageService.getAllNotes());
-             	})
-             	.error(function (data, status, headers, config) {
-		      	console.log('Get All Notes - Error');
-		      	if(notesFunc){
-					notesFunc(localStorageService.getAllNotes());
-				}
-		    });
-          },
-          function(errors) {
-          		func(localStorageService.getAllNotes());
-          },
-          function(updates) {
+		this.isOnline(function(isServerOnline){
+			if(isServerOnline){
+				p.all(urlCalls)
+		          .then(
+		            function(results) {
+		             http.get('/api/notes', { cache:false, timeout:200 }).
+		             	success(function (data, status, headers, config) {
+		             		localStorageService.saveAllNotes(data);
+		             		func(localStorageService.getAllNotes());
+		             	})
+		             	.error(function (data, status, headers, config) {
+				      	console.log('Get All Notes - Error');
+				      	if(notesFunc){
+							notesFunc(localStorageService.getAllNotes());
+						}
+				    });
+		          },
+		          function(errors) {
+		          		func(localStorageService.getAllNotes());
+		          },
+		          function(updates) {
 
-          });		
+		          });		
+		    }
+		    else{
+		        func(localStorageService.getAllNotes());		    	
+		    }
+		});
 	}
 
 	getAllNotes(notesFunc: SuccessfulNotesFunc){
@@ -95,16 +122,37 @@ class NoteProvider{
 	deleteNote(note:Note, notesFunc:SuccessfulNotesFunc){
 		var localStorageService:LocalStorageProvider = this.localStorageService;
 
-		this.httpService.delete('/api/notes/'+note.id).
-		    success(function (data, status, headers, config) {
-		    	console.log('Delete Note - Success');
-		      	localStorageService.deleteOneNote(note);
-		      	if(notesFunc){
-		      		notesFunc(localStorageService.getAllNotes());
-		      	}
-		    }).
-		    error(function (data, status, headers, config) {
-		    	console.log('Delete Note - Error');
+		this.isOnline(function(isServerOnline){
+			if(isServerOnline){
+				this.httpService.delete('/api/notes/'+note.id).
+				    success(function (data, status, headers, config) {
+				    	console.log('Delete Note - Success');
+				      	localStorageService.deleteOneNote(note);
+				      	if(notesFunc){
+				      		notesFunc(localStorageService.getAllNotes());
+				      	}
+				    }).
+				    error(function (data, status, headers, config) {
+				    	console.log('Delete Note - Error');
+				    	if(note.id == "-1"){
+				    		localStorageService.deleteOneNote(note);
+				    		if(notesFunc){
+					      		notesFunc(localStorageService.getAllNotes());
+					      	}
+				    	}
+				    	else{
+					    	note.isDeleted = true;
+					    	note.isModified = true;
+					    	note.modifiedDate = new Date();
+					    	localStorageService.updateOneNote(note);
+					    	if(notesFunc){
+					      		notesFunc(localStorageService.getAllNotes());
+					      	}
+				      	}
+				    }); 
+			}
+			else{
+		    	console.log('Note - not online');
 		    	if(note.id == "-1"){
 		    		localStorageService.deleteOneNote(note);
 		    		if(notesFunc){
@@ -120,7 +168,8 @@ class NoteProvider{
 			      		notesFunc(localStorageService.getAllNotes());
 			      	}
 		      	}
-		    }); 
+			}
+		});
 	}
 
 	newNote(){
@@ -130,43 +179,66 @@ class NoteProvider{
 	updateOneNote(note:Note, notesFunc:SuccessfulNoteFunc){
 		var localStorageService:LocalStorageProvider = this.localStorageService;
 
-		this.httpService.put('/api/notes', { note: note }).
-		    success(function (data, status, headers, config) {
-		    	console.log('Update Note - Success');
-		    	note.isModified = false;
+
+		this.isOnline(function(isServerOnline){
+			if(isServerOnline){
+				this.httpService.put('/api/notes', { note: note }).
+				    success(function (data, status, headers, config) {
+				    	console.log('Update Note - Success');
+				    	note.isModified = false;
+				    	localStorageService.updateOneNote(note);
+				       	if(notesFunc){
+				      		notesFunc(note);
+				      	}
+				    }).
+				    error(function (data, status, headers, config) {
+				      	console.log('Update Note - Error');
+				    	localStorageService.updateOneNote(note);
+				       	if(notesFunc){
+				      		notesFunc(note);
+				      	}
+				    });
+			}
+			else{
+				console.log('Update Note - offline');
 		    	localStorageService.updateOneNote(note);
 		       	if(notesFunc){
 		      		notesFunc(note);
 		      	}
-		    }).
-		    error(function (data, status, headers, config) {
-		      	console.log('Update Note - Error');
-		    	localStorageService.updateOneNote(note);
-		       	if(notesFunc){
-		      		notesFunc(note);
-		      	}
-		    });
+			}
+		});
 	}
 
 	saveOneNote(note:Note, notesFunc:SuccessfulNoteFunc){
 		var localStorageService:LocalStorageProvider = this.localStorageService;
 
-		this.httpService.post('/api/notes', { note: note }).
-		    success(function (data, status, headers, config) {
-		    	console.log('Save Note - Success');
-		    	note.id = data.id;
-		    	note.isModified = false;
+		this.isOnline(function(isServerOnline){
+			if(isServerOnline){
+				this.httpService.post('/api/notes', { note: note }).
+				    success(function (data, status, headers, config) {
+				    	console.log('Save Note - Success');
+				    	note.id = data.id;
+				    	note.isModified = false;
+				    	localStorageService.saveOneNote(note);
+				       	if(notesFunc){
+				      		notesFunc(note);
+				      	}
+				    }).
+				    error(function (data, status, headers, config) {
+				      	console.log('Save Note - Error');
+				    	localStorageService.saveOneNote(note);
+				       	if(notesFunc){
+				      		notesFunc(note);
+				      	}
+				    });
+			}
+			else{
+				console.log('Save Note - Offline');
 		    	localStorageService.saveOneNote(note);
 		       	if(notesFunc){
 		      		notesFunc(note);
 		      	}
-		    }).
-		    error(function (data, status, headers, config) {
-		      	console.log('Save Note - Error');
-		    	localStorageService.saveOneNote(note);
-		       	if(notesFunc){
-		      		notesFunc(note);
-		      	}
-		    });
+			}
+		});
 	}
 }

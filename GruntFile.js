@@ -44,7 +44,7 @@ watch: {
 // https://www.npmjs.org/package/grunt-open
 open: {
     all: {
-        path: 'http://localhost:8081/'
+        path: 'http://192.168.10.103:8081/'
     }
 }
 });

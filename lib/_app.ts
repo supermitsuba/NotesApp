@@ -41,8 +41,9 @@ routerApp
         $interval(function() {
             noteFactory.syncNotes(function(notes){
                 $scope.notes = notes;
-            });    
+            }); 
         }, 30000);
+
 
         $scope.delete = function(note) {
             var r = confirm("Would you like to delete this record?");
