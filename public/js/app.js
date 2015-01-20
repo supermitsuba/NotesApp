@@ -67,6 +67,16 @@ var LocalStorageProvider = (function () {
                 newarr.push(item);
                 unique[item.createdDate] = item;
             }
+            else {
+                if (item.id != "-1" || item.id != null) {
+                    for (var j = 0; j < newarr.length; j++) {
+                        if (newarr[j].createdDate == item.createdDate) {
+                            newarr[j] = item;
+                        }
+                    }
+                    unique[item.createdDate] = item;
+                }
+            }
         }
         localStorage[this.key] = JSON.stringify(newarr);
     };
@@ -79,9 +89,11 @@ var LocalStorageProvider = (function () {
             list = [];
         }
         var listNotes = [];
-        for (var i = 0; i < list.length; i++) {
-            var newItem = new Note(list[i].name, list[i].comment, list[i].createdDate, list[i].modifiedDate, list[i].category, list[i].id, list[i].isModified, list[i].isDeleted);
-            listNotes.push(newItem);
+        if (list != null) {
+            for (var i = 0; i < list.length; i++) {
+                var newItem = new Note(list[i].name, list[i].comment, list[i].createdDate, list[i].modifiedDate, list[i].category, list[i].id, list[i].isModified, list[i].isDeleted);
+                listNotes.push(newItem);
+            }
         }
         return listNotes;
     };
